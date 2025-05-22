@@ -1,4 +1,4 @@
-# vivi-jawk-gomoku
+# vivi-jawk-gomoku 0.1.0
 
 ## How to play?
 - https://aoaochan.github.io/vivi-jawk-gomoku.io/
