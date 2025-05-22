@@ -1,0 +1,43 @@
+name: Build & Deploy to vivi-jawk-gomoku.io
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# 병렬 빌드 방지
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true 
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      id-token: write
+    steps:
+      # 1. 소스 확인
+      - name: Checkout source 
+        uses: actions/checkout@v4 
+      # 2. Node.js & NPM 캐싱
+      - name: Use Node.js 20 
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 
+      # 3. 의존성 설치 및 프로덕션 빌드 
+      - run: npm install 
+      - run: npm run build # (결과물 생성됨 -> ~/dist)
+      - name: Copy README for deploy
+        run: |
+          cp README.deploy.md dist/README.md
+      # 4. Commit and Push to vivi-jawk-gomoku.io
+      - name: Deploy to vivi-jawk-gomoku.io
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DEPLOY_PAT }}
+          external_repository: aoaochan/vivi-jawk-gomoku.io
+          publish_branch: main
+          publish_dir: ./dist 
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
